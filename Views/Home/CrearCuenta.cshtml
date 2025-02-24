@@ -1,0 +1,47 @@
+﻿@model AvatarDinamicoPersonalizado.Models.Usuario
+
+<div class="container mt-5">
+    <h2 class="text-center text-primary mb-4">Crear Cuenta</h2>
+    <form method="post" class="bg-light p-4 rounded shadow-sm">
+        <div class="mb-3">
+            <label for="Nombre" class="form-label">Nombre</label>
+            <input type="text" id="Nombre" name="Nombre" class="form-control" placeholder="Ingresa tu nombre" required />
+        </div>
+        <div class="mb-3">
+            <label for="Email" class="form-label">Email</label>
+            <input type="email" id="Email" name="Email" class="form-control" placeholder="Ingresa tu correo electrónico" required />
+        </div>
+        <div class="mb-3">
+            <label for="ColorAvatar" class="form-label">Color del Avatar</label>
+            <input type="color" id="ColorAvatar" name="ColorAvatar" class="form-control form-control-color" />
+        </div>
+        <button type="submit" class="btn btn-primary w-100 py-2">Crear Cuenta</button>
+    </form>
+</div>
+
+<!-- Custom CSS for better design -->
+<style>
+    .container {
+        max-width: 600px;
+    }
+
+    form {
+        background-color: #f9f9f9;
+        border-radius: 10px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        font-size: 1.1rem;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.25rem rgba(38, 143, 255, 0.25);
+    }
+</style>

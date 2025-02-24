@@ -1,0 +1,67 @@
+﻿@model AvatarDinamicoPersonalizado.Models.Usuario
+
+<div class="container mt-5">
+    <h2 class="text-center text-primary mb-4">Perfil de @Model.Nombre</h2>
+
+    <div class="row justify-content-center">
+        <!-- User Details Section -->
+        <div class="col-12 col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <!-- User Details -->
+                        <div class="me-4">
+                            <h5 class="card-title text-primary mb-3">Detalles de Usuario</h5>
+                            <div class="list-group">
+                                <div class="list-group-item">
+                                    <strong>Nombre:</strong> <span>@Model.Nombre</span>
+                                </div>
+                                <div class="list-group-item">
+                                    <strong>Email:</strong> <span>@Model.Email</span>
+                                </div>
+                                <div class="list-group-item">
+                                    <strong>Color del Avatar:</strong> <span>@Model.ColorAvatar</span>
+                                </div>
+                                <div class="list-group-item">
+                                    <strong>Avatar URL:</strong> <span>@Model.AvatarUrl</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Avatar Section (aligned to the far right) -->
+                        <div class="ms-auto">
+                            <img src="@Model.AvatarUrl" class="img-fluid border shadow" style="width: 150px; height: 150px;" alt="Avatar">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add some custom CSS for extra styling -->
+<style>
+    .card {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .list-group-item {
+        border: none;
+        background-color: transparent;
+    }
+
+    .text-primary {
+        color: #007bff !important;
+    }
+
+    /* Add some spacing for better visual balance */
+    .d-flex {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Spacing for avatar to be fully to the right */
+    .ms-auto {
+        margin-left: auto;
+    }
+</style>
