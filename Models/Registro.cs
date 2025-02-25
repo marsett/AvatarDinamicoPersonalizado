@@ -11,7 +11,7 @@
       );
      */
     #endregion
-    public class Usuario
+    public class Registro
     {
         public int Id { get; set; }
         public string Nombre { get; set; }
@@ -19,5 +19,4 @@
         public string ColorAvatar { get; set; }
         public string AvatarUrl { get; set; } = "";
     }
-
 }

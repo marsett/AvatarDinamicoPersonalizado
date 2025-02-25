@@ -10,6 +10,6 @@ namespace AvatarDinamicoPersonalizado.Data
             : base(options)
         { }
 
-        public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Registro> Usuarios { get; set; }
     }
 }

@@ -1,8 +1,125 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Bienvenido a Avatar Dinámico Personalizado";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container text-center mt-5">
+    <h1 class="display-4 text-primary fw-bold">Avatar Dinámico Personalizado</h1>
+    <p class="lead text-muted">Un sistema que genera automáticamente un avatar con tus iniciales y un color personalizado.</p>
+
+    <!-- Explicación general -->
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <h3 class="text-dark">🔧 ¿Cómo funciona?</h3>
+            <p class="text-muted">
+                Al registrarte, el sistema toma tu nombre y extrae tus iniciales.
+                Luego, genera una imagen en la que estas iniciales aparecen sobre el color que elijas.
+                Finalmente, tu avatar y datos se guardan en la base de datos.
+            </p>
+        </div>
+        <div class="col-md-6">
+            <img src="/images/demo-avatar.png" alt="Ejemplo de Avatar" class="img-fluid shadow-lg rounded">
+        </div>
+    </div>
+
+    <!-- Explicación del HomeController -->
+    <div class="mt-5 text-start">
+        <h2 class="text-center text-primary fw-bold">⚙️ Explicación del Código</h2>
+        <p class="text-muted text-center">Aquí detallamos cómo funciona el controlador principal de la aplicación.</p>
+
+        <!-- Sección de CrearCuenta -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h3 class="text-dark">📝 Registro de Usuario (`CrearCuenta`)</h3>
+                <p>Este método permite a un usuario registrarse en el sistema. Se realizan los siguientes pasos:</p>
+                <ol>
+                    <li>🔄 Se limpian los datos de sesión previos.</li>
+                    <li>✔️ Se validan los datos introducidos por el usuario, si no son válidos devuelve la vista con los datos del usuario.</li>
+                    <li>🔤 Se generan las iniciales del usuario a partir de su nombre.</li>
+                    <li>🎨 Se crea un avatar con el color elegido.</li>
+                    <li>📂 Se almacena el avatar con Path.Combine() , método el cual combina la ruta actual del directorio con la carpeta `/wwwroot/avatars/`.</li>
+                    <li>📁 Si no existe el directorio, lo crea.</li>
+                    <li>🔑 Se genera un nombre único para el archivo usando Guid.NewGuid() para evitar que los archivos se sobreescriban, junto con la extensión .png.</li>
+                    <li>📍 Se combina la ruta del directorio con el nombre del archivo.</li>
+                    <li>💾 Se guarda la imagen generada en el archivo utilizando File.WriteAllBytes(), que escribe los bytes en el archivo especificado.</li>
+                    <li>🌐 Se crea la url del avatar y se asigna al campo AvatarUrl del objeto usuario.</li>
+                    <li>➕ Se agrega el usuario a la base de datos.</li>
+                    <li>💼 Se almacenan los datos del usuario en la sesión para mantenerlos disponibles en las siguientes solicitudes.</li>
+                    <li>🔄 Se redirige al usuario a su perfil utilizando el ID del usuario.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Sección de Login -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h3 class="text-dark">🔑 Login de Usuario (`Login`)</h3>
+                <p>Este método permite a un usuario iniciar sesión en el sistema. Los pasos son los siguientes:</p>
+                <ol>
+                    <li>✔️ Se verifica que los datos proporcionados por el usuario sean válidos.</li>
+                    <li>🔍 Si los datos son válidos, el siguiente paso es buscar en la base de datos un usuario cuyo correo electrónico coincida con el que se ha ingresado en el formulario.</li>
+                    <li>❌ Si no se encuentra un usuario con ese correo electrónico, se establece un mensaje de error.</li>
+                    <li>✅ Si el usuario es válido, se llama al método `GuardarSesion(usuario)`.</li>
+                    <li>➡️ Tras guardar los datos en la sesión, el sistema redirige al usuario a su página de perfil con su id.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Sección de Generación de Avatar -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h3 class="text-dark">🎨 Generación del Avatar (`GenerateAvatar`)</h3>
+                <p>El avatar se genera en base a las iniciales y el color seleccionado:</p>
+                <ol>
+                    <li>🖍 Se crea el objeto Bitmap que representará la imagen del avatar.</li>
+                    <li>🖋 Se usa using para crear el objeto Graphics, dibujar sobre la imagen recién creada y al terminar liberar los recursos usados en el bloque.</li>
+                    <li>🎨 Convertimos el código hexadecimal a un objeto color.</li>
+                    <li>🖌 Se rellena la imagen con el color elegido.</li>
+                    <li>📸 Se crea la fuente de las iniciales.</li>
+                    <li>💾 Se crea el color del texto.</li>
+                    <li>📏 Se mide el ancho y alto del texto que se dibujará (necesario para centrar la imagen).</li>
+                    <li>🎯 Se calculan las coordenadas para centrar las iniciales de la imagen.</li>
+                    <li>💬 Se dibujan las iniciales en el centro de las imágenes usando la fuente, el color y las coordenadas calculadas x e y.</li>
+                    <li>📂 Se convierte la imagen en bytes.</li>
+                    <li>📤 Se guarda la imagen Bitmap en formato PNG.</li>
+                    <li>🔄 Se convierte el MemoryStream en un array de bytes y lo devuelve.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Sección de Conseguir las Iniciales -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h3 class="text-dark">🔠 Conseguir las Iniciales (`GetIniciales`)</h3>
+                <p>Las iniciales que se dibujarán en el avatar se recuperan a partir del nombre introducido por el usuario:</p>
+                <ol>
+                    <li>🔠 Se divide la cadena en un array de palabras. Con Split se divide la cadena usando el espacio como delimitador. StringSplitOptions.RemoveEmptyEntries asegura que si hay espacios consecutivos entre palabras, no se incluirán en el array resultante.</li>
+                    <li>🔡 Se coge la primera letra de la palabra y la convierte a mayúscula y la añade al string de iniciales.</li>
+                    <li>⚡ Si ya se han recogido dos iniciales, se rompe el bucle.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón para ver el código fuente -->
+    <div class="text-center mt-5">
+        <a class="btn btn-outline-secondary btn-lg" href="https://github.com/marsett/AvatarDinamicoPersonalizado">🔍 Ver Código Fuente</a>
+    </div>
 </div>
+
+<style>
+    .container {
+        max-width: 900px;
+    }
+
+    .list-group-item {
+        border: none;
+    }
+
+    img {
+        max-width: 80%;
+    }
+
+    .card {
+        border-left: 5px solid #007bff;
+    }
+</style>

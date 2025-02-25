@@ -8,12 +8,23 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AvatarDinamicoPersonalizado.styles.css" asp-append-version="true" />
+    <style>
+        footer .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        footer .container a {
+            margin-left: 10px;
+        }
+    </style>
 </head>
 <body>
     @{
-        var usuario = Context.Session.GetString("UserName");
+        var usuario = Context.Session.GetString("NombreUsuario");
         var avatar = Context.Session.GetString("AvatarUrl");
-        var id = Context.Session.GetInt32("Id");
+        var id = Context.Session.GetInt32("IdUsuario");
     }
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -28,22 +39,25 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        <li class="nav-item" @(usuario == null ? "" : "hidden")>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Login">Login</a>
+                        </li>
                         <li class="nav-item" @(usuario != null ? "hidden" : "")>
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="CrearCuenta">Crear Cuenta</a>
                         </li>
                     </ul>
-                </div>
-                <div class="usuario d-flex align-items-center">
-                    @if (usuario != null && avatar != null && id.HasValue)
-                    {
-                        <img src="@avatar" alt="Avatar" class="rounded-circle" style="width: 50px; height: 50px; margin-right: 8px;" />
-                        <a class="nav-link text-dark" asp-controller="Home" asp-action="Perfil" asp-route-id="@id.Value" style="margin-right: 15px;">@usuario</a>
-                        <a class="nav-link text-dark" asp-controller="Home" asp-action="Logout">Logout</a>
-                    }
-                    else
-                    {
-                        <span>No estás logueado</span>
-                    }
+                    <div class="usuario d-flex align-items-center">
+                        @if (usuario != null && avatar != null && id.HasValue)
+                        {
+                            <img src="@avatar" alt="Avatar" class="rounded-circle" style="width: 50px; height: 50px; margin-right: 8px;" />
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Perfil" asp-route-id="@id.Value" style="margin-right: 15px;">@usuario</a>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Logout">Logout</a>
+                        }
+                        else
+                        {
+                            <span>No estás logueado</span>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
@@ -55,10 +69,15 @@
     </div>
 
     <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - AvatarDinamicoPersonalizado - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        <div class="container d-flex justify-content-between">
+            <span>&copy; 2025 - AvatarDinamicoPersonalizado</span>
+            <div>
+                <a href="https://www.linkedin.com/in/mario-jiménez-marset-51489825a/" target="_blank" class="text-decoration-none me-3">LinkedIn</a>
+                <a href="https://github.com/marsett" target="_blank" class="text-decoration-none ms-3">GitHub</a>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

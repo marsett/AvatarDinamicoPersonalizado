@@ -1,22 +1,20 @@
-﻿@model AvatarDinamicoPersonalizado.Models.Registro
+﻿@model AvatarDinamicoPersonalizado.Models.Login
 
 <div class="container mt-5">
-    <h2 class="text-center text-primary mb-4">Crear Cuenta</h2>
+    <h2 class="text-center text-primary mb-4">Iniciar Sesión</h2>
+    
     <form method="post" class="bg-light p-4 rounded shadow-sm">
-        <div class="mb-3">
-            <label for="Nombre" class="form-label">Nombre</label>
-            <input type="text" id="Nombre" name="Nombre" class="form-control" placeholder="Ingresa tu nombre" required />
-        </div>
         <div class="mb-3">
             <label for="Email" class="form-label">Correo Electrónico</label>
             <input type="email" id="Email" name="Email" class="form-control" placeholder="Ingresa tu correo electrónico" required />
         </div>
-        <div class="mb-3">
-            <label for="ColorAvatar" class="form-label">Color del Avatar</label>
-            <input type="color" id="ColorAvatar" name="ColorAvatar" class="form-control form-control-color" />
-        </div>
-        <button type="submit" class="btn btn-primary w-100 py-2">Crear Cuenta</button>
+        <button type="submit" class="btn btn-primary w-100 py-2">Iniciar Sesión</button>
     </form>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger" style="margin-top: 20px;">@ViewBag.Error</div>
+    }
 </div>
 
 <style>

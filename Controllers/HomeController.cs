@@ -16,139 +16,209 @@ namespace AvatarDinamicoPersonalizado.Controllers
             _context = context;
         }
 
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        private void GuardarSesion(Registro usuario)
+        {
+            // Se pasa por parámetro el modelo del usuario y se establece
+            // en Session las variables necesarias para guardar la sesión
+            HttpContext.Session.SetString("NombreUsuario", usuario.Nombre);
+            HttpContext.Session.SetString("AvatarUrl", usuario.AvatarUrl);
+            HttpContext.Session.SetInt32("IdUsuario", usuario.Id);
+        }
+
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(Login model)
+        {
+            // Paso 1
+            if (ModelState.IsValid)
+            {
+                // Paso 2
+                var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+                // Paso 3
+                if (usuario != null)
+                {
+                    // Paso 4
+                    GuardarSesion(usuario);
+
+                    // Paso 5
+                    return RedirectToAction("Perfil", new { id = usuario.Id });
+                }
+                else
+                {
+                    ViewBag.Error = "El correo ingresado no está registrado.";
+                } 
+            }
+            return View(model);
+        }
+
+        private string GetIniciales(string nombre)
+        {
+            // Paso 1
+            string[] palabras = nombre.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string iniciales = "";
+
+            // Este bucle recorre cada palabra del array
+            foreach (var palabra in palabras)
+            {
+                // Paso 2
+                iniciales += char.ToUpper(palabra[0]);
+
+                // Paso 3
+                if (iniciales.Length == 2) break;
+            }
+
+            return iniciales;
+        }
+
+        private byte[] GenerarAvatar(string iniciales, string colorHex)
+        {
+            // Dimensiones de la imagen
+            int ancho = 150, alto = 150;
+
+            // Paso 1
+            Bitmap bitmap = new Bitmap(ancho, alto);
+
+            // Paso 2
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                // Paso 3
+                Color color = ColorTranslator.FromHtml(colorHex);
+
+                // Paso 4
+                g.Clear(color);
+
+                // Paso 5
+                Font fuente = new Font("Arial", 50, FontStyle.Bold);
+
+                // Paso 6
+                Brush textoBlanco = Brushes.White;
+
+                // Paso 7
+                SizeF tamano = g.MeasureString(iniciales, fuente);
+
+                // Paso 8
+                float x = (ancho - tamano.Width) / 2;
+                float y = (alto - tamano.Height) / 2;
+
+                // Paso 9
+                g.DrawString(iniciales, fuente, textoBlanco, x, y);
+            }
+
+            // Paso 10
+            using MemoryStream ms = new MemoryStream();
+
+            // Paso 11
+            bitmap.Save(ms, ImageFormat.Png);
+
+            // Paso 12
+            return ms.ToArray();
+        }
+
         public IActionResult CrearCuenta()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> CrearCuenta(Usuario usuario)
+        public async Task<IActionResult> CrearCuenta(Registro usuario)
         {
-            // Limpiar la sesión antes de guardar el nuevo usuario
-            HttpContext.Session.Remove("UserName");
+            // Paso 1
+            HttpContext.Session.Remove("NombreUsuario");
             HttpContext.Session.Remove("AvatarUrl");
-            HttpContext.Session.Remove("Id");
+            HttpContext.Session.Remove("IdUsuario");
 
+            // Paso 2
             if (ModelState.IsValid)
             {
-                // Generar iniciales
-                string initials = GetInitials(usuario.Nombre);
+                // Paso 3
+                string iniciales = GetIniciales(usuario.Nombre);
 
-                // Crear avatar con el color elegido
-                byte[] avatarImage = GenerateAvatar(initials, usuario.ColorAvatar);
+                // Paso 4
+                byte[] imagenAvatar = GenerarAvatar(iniciales, usuario.ColorAvatar);
 
-                // Asegurarse de que la carpeta "avatars" exista
-                string avatarsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatars");
-                if (!Directory.Exists(avatarsFolder))
+                // Paso 5
+                string carpetaAvatar = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatars");
+
+                // Paso 6
+                if (!Directory.Exists(carpetaAvatar))
                 {
-                    Directory.CreateDirectory(avatarsFolder);
+                    Directory.CreateDirectory(carpetaAvatar);
                 }
 
-                // Guardar la imagen generada en un directorio local
-                string fileName = $"{Guid.NewGuid()}.png";
-                string filePath = Path.Combine(avatarsFolder, fileName);
-                System.IO.File.WriteAllBytes(filePath, avatarImage);
+                // Paso 7
+                string nombreAvatar = $"{Guid.NewGuid()}.png";
 
-                // Guardar URL del avatar en la base de datos
-                usuario.AvatarUrl = $"/avatars/{fileName}";
+                // Paso 8
+                string nombreArchivo = Path.Combine(carpetaAvatar, nombreAvatar);
 
-                // Guardar usuario en la base de datos
+                // Paso 9
+                System.IO.File.WriteAllBytes(nombreArchivo, imagenAvatar);
+
+                // Paso 10
+                usuario.AvatarUrl = $"/avatars/{nombreAvatar}";
+
+                // Paso 11
                 _context.Usuarios.Add(usuario);
                 await _context.SaveChangesAsync();
 
-                // Guardar en la sesión el nombre y el avatar
-                HttpContext.Session.SetString("UserName", usuario.Nombre);
+                // Paso 12
+                HttpContext.Session.SetString("NombreUsuario", usuario.Nombre);
                 HttpContext.Session.SetString("AvatarUrl", usuario.AvatarUrl);
-                HttpContext.Session.SetInt32("Id", usuario.Id);
+                HttpContext.Session.SetInt32("IdUsuario", usuario.Id);
 
+                // Paso 13
                 return RedirectToAction("Perfil", new { id = usuario.Id });
             }
             return View(usuario);
         }
 
-        
-
         public async Task<IActionResult> Perfil(int id)
         {
-            // Obtener usuario por ID desde la base de datos
+            // Se busca el usuario en la base de datos
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id);
 
             // Verificar si el usuario no existe
             if (usuario == null)
             {
-                return NotFound(); // Si no se encuentra el usuario, devuelve un error 404
+                return NotFound();
             }
 
-
-            // Verificar si hay datos de sesión
-            var userName = HttpContext.Session.GetString("UserName");
+            // Se recuperan los datos de la sesión si están disponibles
+            var nombreUsuario = HttpContext.Session.GetString("NombreUsuario");
             var avatarUrl = HttpContext.Session.GetString("AvatarUrl");
 
-            // Si los datos existen en la sesión, asignarlos al usuario
-            if (!string.IsNullOrEmpty(userName))
+            // Si los datos de la sesión no son nulos,
+            // se actualizan los datos del usuario
+            if (!string.IsNullOrEmpty(nombreUsuario))
             {
-                usuario.Nombre = userName;
+                usuario.Nombre = nombreUsuario;
                 usuario.AvatarUrl = avatarUrl;
             }
 
+            // Devolver la vista con los datos del usuario
             return View(usuario);
-        }
-
-        private string GetInitials(string nombre)
-        {
-            string[] words = nombre.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            string initials = "";
-
-            foreach (var word in words)
-            {
-                initials += char.ToUpper(word[0]);
-                if (initials.Length == 2) break;
-            }
-
-            return initials;
-        }
-
-        private byte[] GenerateAvatar(string initials, string colorHex)
-        {
-            int width = 150, height = 150;
-            Bitmap bitmap = new Bitmap(width, height);
-
-            using (Graphics g = Graphics.FromImage(bitmap))
-            {
-                // Convertimos el código HEX a Color
-                Color backgroundColor = ColorTranslator.FromHtml(colorHex);
-                g.Clear(backgroundColor);
-
-                // Texto de iniciales
-                Font font = new Font("Arial", 50, FontStyle.Bold);
-                Brush textBrush = Brushes.White;
-                SizeF textSize = g.MeasureString(initials, font);
-                float x = (width - textSize.Width) / 2;
-                float y = (height - textSize.Height) / 2;
-                g.DrawString(initials, font, textBrush, x, y);
-            }
-
-            // Convertimos la imagen en bytes
-            using MemoryStream ms = new MemoryStream();
-            bitmap.Save(ms, ImageFormat.Png);
-            return ms.ToArray();
-        }
-
-        public IActionResult Index()
-        {
-            return View();
         }
 
         public IActionResult Logout()
         {
-            // Eliminar las claves de la sesión relacionadas con el usuario
-            HttpContext.Session.Remove("UserName");
+            // Se eliminan las variables guardadas en Session
+            // para limpiar la sesión y redirige a la vista
+            // principal de la aplicación
+            HttpContext.Session.Remove("NombreUsuario");
             HttpContext.Session.Remove("AvatarUrl");
-            HttpContext.Session.Remove("UserId");
+            HttpContext.Session.Remove("IdUsuario");
 
-            // Redirigir al Index
             return RedirectToAction("Index", "Home");
         }
-
     }
 }
