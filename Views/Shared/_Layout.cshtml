@@ -49,7 +49,7 @@
                     <div class="usuario d-flex align-items-center">
                         @if (usuario != null && avatar != null && id.HasValue)
                         {
-                            <img src="@avatar" alt="Avatar" class="rounded-circle" style="width: 50px; height: 50px; margin-right: 8px;" />
+                            <img src="~/avatars/@avatar" alt="Avatar" class="rounded-circle" style="width: 50px; height: 50px; margin-right: 8px;" />
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Perfil" asp-route-id="@id.Value" style="margin-right: 15px;">@usuario</a>
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Logout">Logout</a>
                         }

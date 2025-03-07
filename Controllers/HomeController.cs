@@ -165,7 +165,7 @@ namespace AvatarDinamicoPersonalizado.Controllers
                 System.IO.File.WriteAllBytes(nombreArchivo, imagenAvatar);
 
                 // Paso 10
-                usuario.AvatarUrl = $"/avatars/{nombreAvatar}";
+                usuario.AvatarUrl = nombreAvatar;
 
                 // Paso 11
                 _context.Usuarios.Add(usuario);
